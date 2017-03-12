@@ -1,6 +1,5 @@
 package org.vaadin.crudui.form;
 
-import com.vaadin.v7.ui.Field;
 import org.vaadin.crudui.crud.CrudOperation;
 
 import java.util.Arrays;

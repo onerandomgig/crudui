@@ -1,10 +1,10 @@
 package org.vaadin.crudui.crud.impl;
 
-import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.v7.ui.Grid;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.Notification;
 import org.vaadin.crudui.crud.AbstractCrudComponent;
 import org.vaadin.crudui.crud.CrudOperation;
@@ -29,8 +29,7 @@ public class GridBasedCrudComponent<T> extends AbstractCrudComponent<T> {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
-    private Grid grid = new Grid();
-    private BeanItemContainer<T> container;
+    private Grid<T> grid = new Grid();
 
     public GridBasedCrudComponent(Class<T> domainType) {
         this(domainType, new WindowBasedCrudLayout());
@@ -63,7 +62,7 @@ public class GridBasedCrudComponent<T> extends AbstractCrudComponent<T> {
         crudLayout.addToolbarComponent(deleteButton);
 
         grid.setSizeFull();
-        grid.setContainerDataSource(container = new BeanItemContainer<>(domainType));
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.addSelectionListener(e -> gridSelectionChanged());
         crudLayout.setMainComponent(grid);
 
@@ -97,9 +96,8 @@ public class GridBasedCrudComponent<T> extends AbstractCrudComponent<T> {
     }
 
     public void refreshGrid() {
-        container.removeAllItems();
-        Collection all = findAllOperation.findAll();
-        container.addAll(all);
+        Collection<T> all = findAllOperation.findAll();
+        grid.setItems(all);
     }
 
     protected void updateButtons() {
@@ -126,7 +124,7 @@ public class GridBasedCrudComponent<T> extends AbstractCrudComponent<T> {
     protected void findAllButtonClicked() {
         grid.select(null);
         refreshGrid();
-        Notification.show(String.format(rowCountCaption, container.size()));
+        Notification.show(String.format(rowCountCaption, grid.get));
     }
 
     protected void addButtonClicked() {
@@ -193,10 +191,6 @@ public class GridBasedCrudComponent<T> extends AbstractCrudComponent<T> {
 
     public Grid getGrid() {
         return grid;
-    }
-
-    public BeanItemContainer getGridContainer() {
-        return container;
     }
 
     public Button getFindAllButton() {
